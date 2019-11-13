@@ -4,13 +4,14 @@ public class Main {
 		
 		int quilometrosEntreEstacoes = 20;
 		//int estacoes = 10 + (int)(Math.random() * 20);
-		int estacoes = 15;
+		int estacoes = 5;
 		//simulador.insertLast(new Ponto("B"));
 		
 		simulador.insertFirst(new Ponto("A"));
-		for (int i = 0; i < estacoes; i++) {
+		for (int i = 1; i <= estacoes; i++) {
 			for (int j = 0; j < quilometrosEntreEstacoes; j++) {
-				//if ()
+				/*if (j == 19)
+					simulador.insert(new Trilho(), pos);*/
 			}
 		}
 	}
