@@ -1,18 +1,25 @@
+import java.util.Calendar;
+
 public class Main {
 	public static void main(String[] args) {
-		DoublyLinkedList<Trilho> simulador = new DoublyLinkedList<Trilho>();
-		
-		int quilometrosEntreEstacoes = 20;
-		//int estacoes = 10 + (int)(Math.random() * 20);
-		int estacoes = 5;
-		//simulador.insertLast(new Ponto("B"));
-		
-		simulador.insertFirst(new Ponto("A"));
-		for (int i = 1; i <= estacoes; i++) {
-			for (int j = 0; j < quilometrosEntreEstacoes; j++) {
-				/*if (j == 19)
-					simulador.insert(new Trilho(), pos);*/
+		Simulator simulator = new Simulator();
+		simulator.fillRails();
+
+		char option = KeyBoard.readChar("Você deseja simular a cada tecla pressionada (S ou N)? ");
+		if (option == 'S' || option == 's') {
+			while (KeyBoard.readChar("Pressione uma tecla e após a tecla Enter: ") != 0) {
+				System.out.println();
+				/*if (simulator.getDate().get(Calendar.HOUR_OF_DAY) == 8 && simulator.getDate().get(Calendar.MINUTE) == 10) break;
+				else {*/
+					simulator.moveTrains();
+					simulator.movePeople();
+					System.out.println(simulator.getDate().getTime());
+					System.out.println(simulator.getList().toString());
+					simulator.addTime(1);
+				//}
 			}
+		} else {
+
 		}
 	}
 }

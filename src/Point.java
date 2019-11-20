@@ -1,7 +1,7 @@
-public class Ponto extends Trilho {
+public class Point {
 	private String nome;
 	
-	public Ponto(String nome) {
+	public Point(String nome) {
 		this.nome = nome;
 	}
 
@@ -11,5 +11,9 @@ public class Ponto extends Trilho {
 
 	public void setNome(String nome) {
 		this.nome = nome;
+	}
+
+	public String toString() {
+		return "|" + nome + "|";
 	}
 }
