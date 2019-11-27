@@ -1,9 +1,11 @@
 public class Detour {
 	private Train train;
 	private Train divertedTrain;
+	private boolean isWaiting;
 
 	public Detour(Train train, Train divertedTrain) {
 		this.train = train;
+		this.divertedTrain = divertedTrain;
 	}
 
 	public Train getTrain() {
@@ -22,9 +24,18 @@ public class Detour {
 		this.divertedTrain = divertedTrain;
 	}
 
+	public boolean isWaiting() {
+		return isWaiting;
+	}
+
+	public void setIsWaiting(boolean isWaiting) {
+		this.isWaiting = isWaiting;
+	}
+
 	public String toString() {
 		if (train == null && divertedTrain == null) return "¬";
 		else if (train != null && divertedTrain == null) return "_";
-		else return "=";
+		else if (train != null && divertedTrain != null) return "=";
+		else return "^";
 	}
 }
