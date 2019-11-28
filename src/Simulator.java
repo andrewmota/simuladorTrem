@@ -6,7 +6,7 @@ public class Simulator {
 	private SinglyLinkedList<Object> list;
 	private int numStations;
 	private Calendar dateTime;
-	int kmStations = 5;
+	int kmStations = 6;
 	int cont = 0;
 
 	public Simulator() {
@@ -86,6 +86,7 @@ public class Simulator {
 				moveDetour((Detour) obj, pos, toAdd, 'l');
 		}
 		addToList(toAdd);
+		cont = 0;
 		
 		// Percorre trilho de trás para frente, movimentando trens com direção R
 		for (int pos = 0; pos < list.numElements(); pos++) {
@@ -105,25 +106,25 @@ public class Simulator {
 	}
 	
 	public void moveDetour(Detour detour, int pos, HashMap<Integer, Object> toAdd, char direction) {
+		Train toUse = new Train();
+		boolean nextStop = false;
+		
 		if (detour.getTrain() != null && detour.getDivertedTrain() == null && detour.getTrain().getDirection() == direction) {
-			int nextPosition = (detour.getTrain().getDirection() == 'r' ? pos + 1 : pos - 1);
-			int lastPosition = (detour.getTrain().getDirection() == 'r' ? pos - 1 : pos + 1);
-			if (nextPosition > 0 && nextPosition < list.numElements())
-				nextStop(detour.getTrain(), nextPosition, lastPosition, pos, toAdd);
-		} else if (cont > 0 && detour.getTrain() != null && detour.getDivertedTrain() != null && detour.getTrain().getDirection() == direction && detour.getDivertedTrain().getDirection() != direction) {
-			int nextPosition = (detour.getTrain().getDirection() == 'r' ? pos + 1 : pos - 1);
-			int lastPosition = (detour.getTrain().getDirection() == 'r' ? pos - 1 : pos + 1);
-			if (nextPosition > 0 && nextPosition < list.numElements())
-				nextStop(detour.getTrain(), nextPosition, lastPosition, pos, toAdd);
+			toUse = detour.getTrain();
+			nextStop = true;
+		} else if (cont == 0 && (detour.getTrain() != null || detour.getDivertedTrain() != null)) {
 			cont += 1;
-		} else if (cont > 1 && detour.getDivertedTrain() != null && detour.getDivertedTrain().getDirection() != direction) {
-			int nextPositionDiverted = (detour.getDivertedTrain().getDirection() == 'r' ? pos + 1 : pos - 1);
-			int lastPositionDiverted = (detour.getDivertedTrain().getDirection() == 'r' ? pos - 1 : pos + 1);
-			if (nextPositionDiverted > 0 && nextPositionDiverted < list.numElements())
-				nextStop(detour.getDivertedTrain(), nextPositionDiverted, lastPositionDiverted, pos, toAdd);
-			cont = 0;
-		} else if (cont == 0 && detour.getTrain() != null && detour.getDivertedTrain() != null && detour.getTrain().getDirection() == direction && detour.getDivertedTrain().getDirection() != direction)
-			cont += 1;
+		} else if (cont > 0 && ((detour.getTrain() != null && detour.getTrain().getDirection() == direction) || (detour.getDivertedTrain() != null && detour.getDivertedTrain().getDirection() == direction))) {
+			toUse = detour.getTrain() != null ? detour.getTrain() : detour.getDivertedTrain();
+			nextStop = true;
+		}
+		
+		if (nextStop && toUse.getDirection() == direction) {
+			int nextPosition = (toUse.getDirection() == 'r' ? pos + 1 : pos - 1);
+			int lastPosition = (toUse.getDirection() == 'r' ? pos - 1 : pos + 1);
+			if (nextPosition > 0 && nextPosition < list.numElements())
+				nextStop(toUse, nextPosition, lastPosition, pos, toAdd);
+		}
 	}
 	
 	public void moveTrain(Train train, int pos, HashMap<Integer, Object> toAdd, char direction) {
@@ -248,6 +249,14 @@ public class Simulator {
 				break;
 			
 			case "Point":
+				/* TODO
+				 * 		quando for point, virar direção do trem ou melhor, começar um novo
+				 */
+				list.remove(pos);
+				list.insert(new Rail(), pos);
+				break;
+				
+			case "Train":
 				/* TODO
 				 * 		quando for point, virar direção do trem ou melhor, começar um novo
 				 */

@@ -2,6 +2,9 @@ public class Train {
 	private int numPeople;
 	private char direction;
 
+	public Train() {
+	}
+	
 	public Train(int numPeople, char direction) {
 		this.numPeople = numPeople;
 		this.direction = direction;

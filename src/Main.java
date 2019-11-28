@@ -19,7 +19,13 @@ public class Main {
 				//}
 			}
 		} else {
-
+			while (!(simulator.getDate().get(Calendar.HOUR_OF_DAY) == 10 && simulator.getDate().get(Calendar.MINUTE) == 30)) {
+				simulator.moveTrains();
+				simulator.movePeople();
+				System.out.println(simulator.getDate().getTime());
+				System.out.println(simulator.getList().toString());
+				simulator.addTime(1);
+			}
 		}
 	}
 }
