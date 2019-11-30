@@ -107,21 +107,34 @@ public class Simulator {
 	
 	public void moveDetour(Detour detour, int pos, HashMap<Integer, Object> toAdd, char direction) {
 		Train toUse = new Train();
-		boolean nextStop = false;
+		boolean hasTrain = false;
+		int nextPosition = 0;
+		int lastPosition = 0;
 		
-		if (detour.getTrain() != null && detour.getDivertedTrain() == null && detour.getTrain().getDirection() == direction) {
-			toUse = detour.getTrain();
-			nextStop = true;
-		} else if (cont == 0 && (detour.getTrain() != null || detour.getDivertedTrain() != null)) {
-			cont += 1;
-		} else if (cont > 0 && ((detour.getTrain() != null && detour.getTrain().getDirection() == direction) || (detour.getDivertedTrain() != null && detour.getDivertedTrain().getDirection() == direction))) {
+		if ((detour.getTrain() != null && detour.getTrain().getDirection() == direction) || (detour.getDivertedTrain() != null && detour.getDivertedTrain().getDirection() == direction)) {
 			toUse = detour.getTrain() != null ? detour.getTrain() : detour.getDivertedTrain();
-			nextStop = true;
+			nextPosition = (toUse.getDirection() == 'r' ? pos + 1 : pos - 1);
+			lastPosition = (toUse.getDirection() == 'r' ? pos - 1 : pos + 1);
+			
+			for (int j = 1; j < list.numElements(); j++) {
+				if (nextPosition + j > list.numElements()-1 || nextPosition - j < 0)
+					break;
+				Object current = list.get(toUse.getDirection() == 'r' ? nextPosition + j : nextPosition - j);
+				
+				if (current.getClass().getName().equals("Detour")) {
+					Detour dt = (Detour) current;
+					if (dt.getTrain() != null && dt.getTrain().getDirection() != toUse.getDirection())
+						hasTrain = true;
+				} else if (current.getClass().getName().equals("Train") && ((Train) current).getDirection() != toUse.getDirection())
+					hasTrain = true;
+				else if (current.getClass().getName().equals("Station") || current.getClass().getName().equals("point"))
+					break;
+			}
+			
+			System.out.println((detour.getTrain() != null ? "trem normal: " : "trem diverted: ") + hasTrain);
 		}
 		
-		if (nextStop && toUse.getDirection() == direction) {
-			int nextPosition = (toUse.getDirection() == 'r' ? pos + 1 : pos - 1);
-			int lastPosition = (toUse.getDirection() == 'r' ? pos - 1 : pos + 1);
+		if (!hasTrain && toUse.getDirection() == direction) {
 			if (nextPosition > 0 && nextPosition < list.numElements())
 				nextStop(toUse, nextPosition, lastPosition, pos, toAdd);
 		}
@@ -178,10 +191,10 @@ public class Simulator {
 				 * 		Se ngm for descer ou subir, esperar um tempo
 				 */
 				
-				//int goingDown = random(0, train.getNumPeople() > 10 ? 10 : train.getNumPeople());
-				//int goingUp = random(0, ((50 - train.getNumPeople()) < 10 ? 50 - train.getNumPeople() : 10));
-				int goingDown = random(0, 2);
-				int goingUp = random(0, 2);
+				int goingDown = random(0, train.getNumPeople() > 10 ? 10 : train.getNumPeople());
+				int goingUp = random(0, ((50 - train.getNumPeople()) < 10 ? 50 - train.getNumPeople() : 10));
+				//int goingDown = random(0, 2);
+				//int goingUp = random(0, 2);
 				s.setNumGoingDown(goingDown);
 				s.setNumGoingUp(goingUp);
 				s.setIsWaiting(goingDown == 0 && goingUp == 0);
