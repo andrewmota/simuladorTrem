@@ -34,7 +34,7 @@ public class Detour {
 
 	public String toString() {
 		if (train == null && divertedTrain == null) return "¬";
-		else if (train != null && divertedTrain == null) return "_";
+		else if (train != null && divertedTrain == null) return train.getDirection() == 'r' ? ">" : "<";
 		else if (train != null && divertedTrain != null) return "=";
 		else return "^";
 	}

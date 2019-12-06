@@ -14,18 +14,17 @@ public class Simulator {
 		//this.numStations = random(10, 30);
 		this.numStations = 4;
 		this.dateTime = Calendar.getInstance();
-		
-		dateTime.set(Calendar.HOUR_OF_DAY, 8);
-		dateTime.set(Calendar.MINUTE, 0);
-		dateTime.set(Calendar.SECOND, 0);
-		dateTime.set(Calendar.MILLISECOND, 0);
+		this.dateTime.set(Calendar.HOUR_OF_DAY, 8);
+		this.dateTime.set(Calendar.MINUTE, 0);
+		this.dateTime.set(Calendar.SECOND, 0);
+		this.dateTime.set(Calendar.MILLISECOND, 0);
 	}
 
 	public SinglyLinkedList<Object> getList() {
 		return list;
 	}
 
-	public void setList(SinglyLinkedList	<Object> list) {
+	public void setList(SinglyLinkedList<Object> list) {
 		this.list = list;
 	}
 
@@ -86,9 +85,8 @@ public class Simulator {
 				moveDetour((Detour) obj, pos, toAdd, 'l');
 		}
 		addToList(toAdd);
-		cont = 0;
 		
-		// Percorre trilho de trás para frente, movimentando trens com direção R
+		// Percorre trilho de frente para trás, movimentando trens com direção R
 		for (int pos = 0; pos < list.numElements(); pos++) {
 			Object obj = list.get(pos);
 			
@@ -111,27 +109,62 @@ public class Simulator {
 		int nextPosition = 0;
 		int lastPosition = 0;
 		
-		if ((detour.getTrain() != null && detour.getTrain().getDirection() == direction) || (detour.getDivertedTrain() != null && detour.getDivertedTrain().getDirection() == direction)) {
+		if (detour.getTrain() != null && detour.getTrain().getDirection() == direction && detour.getDivertedTrain() == null) {
 			toUse = detour.getTrain() != null ? detour.getTrain() : detour.getDivertedTrain();
 			nextPosition = (toUse.getDirection() == 'r' ? pos + 1 : pos - 1);
 			lastPosition = (toUse.getDirection() == 'r' ? pos - 1 : pos + 1);
 			
-			for (int j = 1; j < list.numElements(); j++) {
+			for (int j = 0; j <= kmStations; j++) {
 				if (nextPosition + j > list.numElements()-1 || nextPosition - j < 0)
 					break;
 				Object current = list.get(toUse.getDirection() == 'r' ? nextPosition + j : nextPosition - j);
-				
 				if (current.getClass().getName().equals("Detour")) {
 					Detour dt = (Detour) current;
-					if (dt.getTrain() != null && dt.getTrain().getDirection() != toUse.getDirection())
+					if (dt.getTrain() != null && dt.getTrain().getDirection() != toUse.getDirection()) {
 						hasTrain = true;
-				} else if (current.getClass().getName().equals("Train") && ((Train) current).getDirection() != toUse.getDirection())
+						break;
+					}
+				} else if (current.getClass().getName().equals("Train") && ((Train) current).getDirection() != toUse.getDirection()) {
 					hasTrain = true;
-				else if (current.getClass().getName().equals("Station") || current.getClass().getName().equals("point"))
+					break;
+				} else if (current.getClass().getName().equals("Station") || current.getClass().getName().equals("point"))
 					break;
 			}
+		} else if (detour.getDivertedTrain() != null && detour.getTrain() != null) {
+			System.out.println("AQUIIII");
+			if (detour.getTrain().getDirection() == direction && cont > 0) {
+				toUse = detour.getTrain();
+				nextPosition = (toUse.getDirection() == 'r' ? pos + 1 : pos - 1);
+				lastPosition = (toUse.getDirection() == 'r' ? pos - 1 : pos + 1);
+				cont = 0;
+			} else if (detour.getDivertedTrain().getDirection() == direction && cont > 0) {
+				toUse = detour.getDivertedTrain();
+				nextPosition = (toUse.getDirection() == 'r' ? pos + 1 : pos - 1);
+				lastPosition = (toUse.getDirection() == 'r' ? pos - 1 : pos + 1);
+				cont = 0;
+			}
+			cont += 1;
+		} else if (detour.getDivertedTrain() != null && detour.getTrain() == null && detour.getDivertedTrain().getDirection() == direction) {
+			toUse = detour.getDivertedTrain();
+			nextPosition = (toUse.getDirection() == 'r' ? pos + 1 : pos - 1);
+			lastPosition = (toUse.getDirection() == 'r' ? pos - 1 : pos + 1);
 			
-			System.out.println((detour.getTrain() != null ? "trem normal: " : "trem diverted: ") + hasTrain);
+			for (int j = 0; j <= kmStations; j++) {
+				if (nextPosition + j > list.numElements()-1 || nextPosition - j < 0)
+					break;
+				Object current = list.get(toUse.getDirection() == 'r' ? nextPosition + j : nextPosition - j);
+				if (current.getClass().getName().equals("Detour")) {
+					Detour dt = (Detour) current;
+					if (dt.getTrain() != null && dt.getTrain().getDirection() != toUse.getDirection()) {
+						hasTrain = true;
+						break;
+					}
+				} else if (current.getClass().getName().equals("Train") && ((Train) current).getDirection() != toUse.getDirection()) {
+					hasTrain = true;
+					break;
+				} else if (current.getClass().getName().equals("Station") || current.getClass().getName().equals("point"))
+					break;
+			}
 		}
 		
 		if (!hasTrain && toUse.getDirection() == direction) {
@@ -191,10 +224,10 @@ public class Simulator {
 				 * 		Se ngm for descer ou subir, esperar um tempo
 				 */
 				
-				int goingDown = random(0, train.getNumPeople() > 10 ? 10 : train.getNumPeople());
-				int goingUp = random(0, ((50 - train.getNumPeople()) < 10 ? 50 - train.getNumPeople() : 10));
-				//int goingDown = random(0, 2);
-				//int goingUp = random(0, 2);
+				//int goingDown = random(0, train.getNumPeople() > 10 ? 10 : train.getNumPeople());
+				//int goingUp = random(0, ((50 - train.getNumPeople()) < 10 ? 50 - train.getNumPeople() : 10));
+				int goingDown = random(0, 3);
+				int goingUp = random(0, 4);
 				s.setNumGoingDown(goingDown);
 				s.setNumGoingUp(goingUp);
 				s.setIsWaiting(goingDown == 0 && goingUp == 0);
@@ -209,8 +242,18 @@ public class Simulator {
 				break;
 				
 			case "Rail":
-				list.remove(pos);
-				list.insert(lastObj.getClass().getName().equals("Station") ? new Detour(null, null) : new Rail(), pos);
+				if (lastObj.getClass().getName().equals("Station")) {
+					Detour dt = (Detour) list.get(pos);
+					if (dt.getTrain() != null && dt.getTrain().getDirection() == train.getDirection())
+						dt.setTrain(null);
+					else if (dt.getDivertedTrain() != null && dt.getDivertedTrain().getDirection() == train.getDirection())
+						dt.setDivertedTrain(null);
+					list.remove(pos);
+					list.insert(dt, pos);
+				} else {
+					list.remove(pos);
+					list.insert(new Rail(), pos);
+				}
 				toAdd.put(nextPosition, train);
 				break;
 				
@@ -220,7 +263,6 @@ public class Simulator {
 				list.insert(new Rail(), pos);
 				
 				if (dt.getDivertedTrain() != null) {
-					System.out.println("pos: " + nextPosition + " tem um trem desviado");
 					cont = 0;
 					dt.setTrain(train);
 					toAdd.put(nextPosition, dt);
@@ -228,15 +270,10 @@ public class Simulator {
 					Object afterDetour = list.get(train.getDirection() == 'r' ? nextPosition + 1 : nextPosition - 1);
 					if (afterDetour.getClass().getName().equals("Station")) {
 						Station station = (Station) afterDetour;
-						if (station.getTrain() != null && station.getTrain().getDirection() != train.getDirection()) {
-							toAdd.put(nextPosition, new Detour(null, train));
-							/*list.remove(nextPosition);
-							list.insert(new Detour(null, train), nextPosition);*/
-						} else
-							toAdd.put(nextPosition, new Detour(train, null));
+						if (station.getTrain() != null && station.getTrain().getDirection() != train.getDirection()) toAdd.put(nextPosition, new Detour(null, train));
+						else toAdd.put(nextPosition, new Detour(train, null));
 					} else {
 						boolean hasTrain = false;
-						
 						for (int j = 1; j < list.numElements(); j++) {
 							if (nextPosition + j > list.numElements()-1 || nextPosition - j < 0)
 								break;
@@ -248,7 +285,7 @@ public class Simulator {
 									hasTrain = true;
 							} else if (current.getClass().getName().equals("Train") && ((Train) current).getDirection() != train.getDirection())
 								hasTrain = true;
-							else if (current.getClass().getName().equals("Station") || current.getClass().getName().equals("point"))
+							else if (current.getClass().getName().equals("Station") || current.getClass().getName().equals("Point"))
 								break;
 						}
 						

@@ -27,6 +27,6 @@ public class Train {
 	}
 
 	public String toString() {
-		return "_";
+		return this.direction == 'r' ? ">" : "<";
 	}
 }
